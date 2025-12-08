@@ -30,7 +30,6 @@ public class BankServer {
 
                 pool.execute(handler);
             }
-
         } catch (IOException e) {
             System.err.println("Erreur serveur : " + e.getMessage());
         } finally {
