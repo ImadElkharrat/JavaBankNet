@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountDAO {
 
@@ -13,7 +15,6 @@ public class AccountDAO {
     public AccountDAO() {
         this.connection = DatabaseSource.getDataSource().getConnection();
     }
-
 
     public boolean createAccount(Account account, int userId) {
         String sql = "INSERT INTO accounts (account_number, user_id, balance, type) VALUES (?, ?, ?, ?)";
@@ -54,6 +55,28 @@ public class AccountDAO {
             System.err.println("Erreur SQL (Select) : " + e.getMessage());
         }
         return null;
+    }
+
+    public List<Account> getAccountsByUserId(int userId) {
+        List<Account> userAccounts = new ArrayList<>();
+        String sql = "SELECT * FROM accounts WHERE user_id = ?";
+
+        try (java.sql.PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    userAccounts.add(new Account(
+                            rs.getString("account_number"),
+                            rs.getInt("user_id"),
+                            rs.getDouble("balance"),
+                            rs.getString("type")
+                    ));
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return userAccounts;
     }
 
 

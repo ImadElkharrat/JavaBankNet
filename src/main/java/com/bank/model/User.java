@@ -13,12 +13,6 @@ public class User implements Serializable {
         ADMIN, CLIENT
     }
 
-    public User(String username, String passwordHash, UserRole role) {
-        this.username = username;
-        this.passwordHash = passwordHash;
-        this.role = role;
-    }
-
     public User(int id, String username, String passwordHash, UserRole role) {
         this.id = id;
         this.username = username;
@@ -28,15 +22,9 @@ public class User implements Serializable {
 
     public int getId() { return id; }
     public String getUsername() { return username; }
-    public String getPasswordHash() { return passwordHash; }
     public UserRole getRole() { return role; }
 
     public boolean isAdmin() {
         return this.role == UserRole.ADMIN;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" + "id=" + id + ", username='" + username + '\'' + ", role=" + role + '}';
     }
 }

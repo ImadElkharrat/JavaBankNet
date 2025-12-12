@@ -9,15 +9,19 @@ import java.util.Properties;
 
 public class DatabaseSource {
 
+    // L'instance unique (Singleton)
     private static DatabaseSource instance;
     private Connection connection;
 
+    // Variables de config
     private String url;
     private String username;
     private String password;
 
+    // Constructeur PRIVÉ : Personne ne peut faire "new DatabaseSource()"
     private DatabaseSource() {
         try {
+            // 1. Charger les propriétés
             Properties props = new Properties();
             InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties");
 
@@ -31,8 +35,10 @@ public class DatabaseSource {
             this.username = props.getProperty("db.user");
             this.password = props.getProperty("db.password");
 
+            // 2. Charger le Driver MySQL (Optionnel sur les versions récentes de Java, mais recommandé)
             Class.forName("com.mysql.cj.jdbc.Driver");
 
+            // 3. Créer la connexion
             this.connection = DriverManager.getConnection(url, username, password);
             System.out.println("Connexion à la Base de Données réussie !");
 
@@ -42,6 +48,7 @@ public class DatabaseSource {
         }
     }
 
+    // Point d'accès global
     public static DatabaseSource getDataSource() {
         if (instance == null) {
             instance = new DatabaseSource();
