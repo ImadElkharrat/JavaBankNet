@@ -1,12 +1,10 @@
-/* Base Application Settings */
 .root {
     -fx-font-family: 'Segoe UI', sans-serif;
-    -fx-background-color: #f1f5f9; /* Light Grey Background */
+    -fx-background-color: #f1f5f9;
 }
 
-/* Modern Buttons */
 .button {
-    -fx-background-color: #3b82f6; /* Modern Blue */
+    -fx-background-color: #3b82f6;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 10 20;
@@ -17,7 +15,7 @@
 }
 
 .button:hover {
-    -fx-background-color: #2563eb; /* Darker Blue on hover */
+    -fx-background-color: #2563eb;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
@@ -26,21 +24,18 @@
     -fx-background-color: #1d4ed8;
 }
 
-/* Action Buttons (Transfer) */
 .action-btn {
-    -fx-background-color: #10b981; /* Emerald Green */
+    -fx-background-color: #10b981;
     -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.3), 10, 0, 0, 4);
 }
 .action-btn:hover { -fx-background-color: #059669; }
 
-/* Critical Buttons (Logout, Delete) */
 .danger-btn {
-    -fx-background-color: #ef4444; /* Red */
+    -fx-background-color: #ef4444;
     -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.3), 10, 0, 0, 4);
 }
 .danger-btn:hover { -fx-background-color: #dc2626; }
 
-/* Text Fields */
 .text-field, .password-field {
     -fx-background-color: white;
     -fx-border-color: #e2e8f0;
@@ -54,7 +49,6 @@
     -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.2), 5, 0, 0, 2);
 }
 
-/* Cards (Container for Content) */
 .card {
     -fx-background-color: white;
     -fx-background-radius: 12;
@@ -62,9 +56,8 @@
     -fx-padding: 30;
 }
 
-/* Sidebar */
 .sidebar {
-    -fx-background-color: #0f172a; /* Dark Navy */
+    -fx-background-color: #0f172a;
 }
 .sidebar-label {
     -fx-text-fill: white;
@@ -72,7 +65,6 @@
     -fx-font-weight: bold;
 }
 
-/* Lists */
 .list-view {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
@@ -86,15 +78,14 @@
 .list-cell:filled:selected, .list-cell:filled:hover {
     -fx-background-color: #eff6ff;
     -fx-text-fill: black;
-}/* Base Application Settings */
+}
  .root {
      -fx-font-family: 'Segoe UI', sans-serif;
-     -fx-background-color: #f1f5f9; /* Light Grey Background */
+     -fx-background-color: #f1f5f9;
  }
 
- /* Modern Buttons */
  .button {
-     -fx-background-color: #3b82f6; /* Modern Blue */
+     -fx-background-color: #3b82f6;
      -fx-text-fill: white;
      -fx-font-weight: bold;
      -fx-padding: 10 20;
@@ -105,7 +96,7 @@
  }
 
  .button:hover {
-     -fx-background-color: #2563eb; /* Darker Blue on hover */
+     -fx-background-color: #2563eb;
      -fx-scale-x: 1.05;
      -fx-scale-y: 1.05;
  }
@@ -114,21 +105,18 @@
      -fx-background-color: #1d4ed8;
  }
 
- /* Action Buttons (Transfer) */
  .action-btn {
-     -fx-background-color: #10b981; /* Emerald Green */
+     -fx-background-color: #10b981;
      -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.3), 10, 0, 0, 4);
  }
  .action-btn:hover { -fx-background-color: #059669; }
 
- /* Critical Buttons (Logout, Delete) */
  .danger-btn {
-     -fx-background-color: #ef4444; /* Red */
+     -fx-background-color: #ef4444;
      -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.3), 10, 0, 0, 4);
  }
  .danger-btn:hover { -fx-background-color: #dc2626; }
 
- /* Text Fields */
  .text-field, .password-field {
      -fx-background-color: white;
      -fx-border-color: #e2e8f0;
@@ -142,7 +130,6 @@
      -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.2), 5, 0, 0, 2);
  }
 
- /* Cards (Container for Content) */
  .card {
      -fx-background-color: white;
      -fx-background-radius: 12;
@@ -150,9 +137,8 @@
      -fx-padding: 30;
  }
 
- /* Sidebar */
  .sidebar {
-     -fx-background-color: #0f172a; /* Dark Navy */
+     -fx-background-color: #0f172a;
  }
  .sidebar-label {
      -fx-text-fill: white;
@@ -160,7 +146,6 @@
      -fx-font-weight: bold;
  }
 
- /* Lists */
  .list-view {
      -fx-background-color: transparent;
      -fx-border-color: transparent;

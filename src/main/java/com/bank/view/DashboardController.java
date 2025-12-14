@@ -19,10 +19,8 @@ public class DashboardController {
     @FXML private Label welcomeLabel;
     @FXML private Button adminBatchButton;
 
-    // Liste des comptes (Gauche)
     @FXML private ListView<String> accountsList;
 
-    // Tableaux des transactions (Centre)
     @FXML private TableView<Transaction> historyTable;
     @FXML private TableColumn<Transaction, String> colDate;
     @FXML private TableColumn<Transaction, String> colType;
@@ -37,19 +35,14 @@ public class DashboardController {
             adminBatchButton.setVisible(true);
         }
 
-        // Configuration des colonnes du tableau
-        // Ces noms ("timestamp", "type", etc.) doivent correspondre aux Getters de ton modèle Transaction
         colDate.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colSource.setCellValueFactory(new PropertyValueFactory<>("sourceAccountId"));
         colDest.setCellValueFactory(new PropertyValueFactory<>("destAccountId"));
         colAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
-        // Ajout d'un écouteur : Quand on clique sur un compte, on charge son historique
         accountsList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                // Le format dans la liste est "NUMERO - SOLDE DH..."
-                // On extrait juste le numéro (tout ce qui est avant le " - ")
                 String accountNumber = newVal.split(" - ")[0];
                 loadHistory(accountNumber);
             }
@@ -79,25 +72,24 @@ public class DashboardController {
         String response = NetworkClient.getInstance().sendRequest("GET_HISTORY " + accountId);
 
         if (response.startsWith("SUCCES_HISTORY:")) {
-            String rawData = response.substring(15); // Enlever le préfixe
+            String rawData = response.substring(15);
             String[] lines = rawData.split(";");
 
             ObservableList<Transaction> transactions = FXCollections.observableArrayList();
 
             for (String line : lines) {
                 if (line.isBlank()) continue;
-                String[] parts = line.split("\\|"); // Le séparateur est |
+                String[] parts = line.split("\\|");
 
-                // Format attendu: ID|TYPE|AMOUNT|SOURCE|DEST|DATE
                 if (parts.length >= 6) {
                     try {
                         Transaction tx = new Transaction(
-                                Integer.parseInt(parts[0]),     // ID
-                                parts[3],                       // Source
-                                parts[4],                       // Dest
-                                Double.parseDouble(parts[2]),   // Amount
-                                com.bank.model.Transaction.TransactionType.valueOf(parts[1]), // Type
-                                LocalDateTime.parse(parts[5])   // Date (ISO Format)
+                                Integer.parseInt(parts[0]),
+                                parts[3],
+                                parts[4],
+                                Double.parseDouble(parts[2]),
+                                com.bank.model.Transaction.TransactionType.valueOf(parts[1]),
+                                LocalDateTime.parse(parts[5])
                         );
                         transactions.add(tx);
                     } catch (Exception e) {
@@ -113,7 +105,7 @@ public class DashboardController {
     private void handleTransfer() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/transfer_view.fxml"));
-            Scene scene = new Scene(loader.load(), 350, 400); // Légèrement plus grand pour le style
+            Scene scene = new Scene(loader.load(), 350, 400);
             Stage stage = new Stage();
             stage.setTitle("Nouveau Virement");
             stage.setScene(scene);

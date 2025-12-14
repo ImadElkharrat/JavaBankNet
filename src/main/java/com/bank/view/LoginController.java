@@ -26,15 +26,12 @@ public class LoginController {
 
         if (response != null && response.startsWith("SUCCES")) {
             try {
-                // Charger le Dashboard
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard_view.fxml"));
                 javafx.scene.Parent root = loader.load();
 
-                // Passer le nom d'utilisateur au contrôleur du Dashboard
                 DashboardController dashboard = loader.getController();
                 dashboard.initData(user);
 
-                // Changer de scène
                 Stage stage = (Stage) usernameField.getScene().getWindow();
                 stage.setScene(new Scene(root));
 

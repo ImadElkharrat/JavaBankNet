@@ -24,16 +24,14 @@ public class TransferController {
             return;
         }
 
-        // Envoi de la commande au serveur
         String command = "TRANSFER " + source + " " + dest + " " + amount;
         String response = NetworkClient.getInstance().sendRequest(command);
 
         if (response.startsWith("SUCCES")) {
-            // Fermer la fenêtre si c'est bon
             Stage stage = (Stage) statusLabel.getScene().getWindow();
             stage.close();
         } else {
-            statusLabel.setText(response); // Afficher l'erreur du serveur
+            statusLabel.setText(response);
         }
     }
 }

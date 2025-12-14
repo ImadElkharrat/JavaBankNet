@@ -19,8 +19,8 @@ public class ClientHandler implements Runnable {
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
-        this.accountDAO = new AccountDAO(); // Connexion DB pour les comptes
-        this.userDAO = new UserDAO();       // Connexion DB pour le login
+        this.accountDAO = new AccountDAO();
+        this.userDAO = new UserDAO();
         this.transactionDAO = new TransactionDAO();
     }
 
@@ -38,7 +38,6 @@ public class ClientHandler implements Runnable {
                 String[] parts = request.split(" ");
                 String command = parts[0].toUpperCase();
 
-                // --- GESTION LOGIN ---
                 if ("LOGIN".equals(command)) {
                     if (parts.length < 3) {
                         out.println("ERREUR: Usage LOGIN <user> <pass>");
@@ -53,7 +52,6 @@ public class ClientHandler implements Runnable {
                     }
                 }
 
-                // --- GESTION MY_ACCOUNTS (Pour le Dashboard) ---
                 else if ("MY_ACCOUNTS".equals(command)) {
                     if (currentUser == null) {
                         out.println("ERREUR: Non connecté.");
@@ -63,7 +61,6 @@ public class ClientHandler implements Runnable {
                         if (myAccounts.isEmpty()) {
                             out.println("INFO: Aucun compte trouvé.");
                         } else {
-                            // Construction de la réponse : "NUMERO - SOLDE DH; NUMERO2..."
                             StringBuilder sb = new StringBuilder("SUCCES_LIST:");
                             for (Account a : myAccounts) {
                                 sb.append(a.getAccountNumber())
@@ -76,7 +73,6 @@ public class ClientHandler implements Runnable {
                     }
                 }
 
-                // --- GESTION TRANSFER ---
                 else if ("TRANSFER".equals(command)) {
                     if (parts.length < 4) {
                         out.println("ERREUR: Usage TRANSFER <src> <dest> <amount>");
@@ -97,22 +93,18 @@ public class ClientHandler implements Runnable {
                         if (srcAccount == null || destAccount == null) {
                             out.println("ERREUR: Un des comptes n'existe pas.");
                         } else {
-                            // Check ownership (Security)
                             if (currentUser.getId() != srcAccount.getUserId() && !currentUser.isAdmin()) {
                                 out.println("ERREUR: Vous ne pouvez pas débiter ce compte.");
                             } else {
-                                // SYNCHRONIZATION
                                 synchronized (srcAccount) {
                                     if (srcAccount.withdraw(amount)) {
                                         synchronized (destAccount) {
                                             destAccount.deposit(amount);
                                         }
 
-                                        // 1. Update Balances in DB
                                         accountDAO.updateBalance(srcAccount);
                                         accountDAO.updateBalance(destAccount);
 
-                                        // 2. LOG THE TRANSACTION IN DB (The missing part!)
                                         transactionDAO.logTransaction(srcId, destId, amount, "VIREMENT");
 
                                         out.println("SUCCES: Virement effectué !");
@@ -125,32 +117,25 @@ public class ClientHandler implements Runnable {
                     }
                 }
 
-                // --- GESTION HISTORIQUE ---
                 else if ("GET_HISTORY".equals(command)) {
-                    // Format: GET_HISTORY <accountId>
                     if (parts.length < 2) {
                         out.println("ERREUR: Usage GET_HISTORY <accountId>");
                     } else {
                         String targetAccountId = parts[1];
 
-                        // 1. Vérifier que le compte existe
                         Account acc = accountDAO.findAccount(targetAccountId);
                         if (acc == null) {
                             out.println("ERREUR: Compte introuvable.");
                         }
-                        // 2. Vérifier la sécurité (Est-ce que c'est MON compte ?)
                         else if (currentUser.getId() != acc.getUserId() && !currentUser.isAdmin()) {
                             out.println("ERREUR: Accès refusé à l'historique de ce compte.");
                         }
                         else {
-                            // 3. Récupérer la liste via le DAO
                             List<com.bank.model.Transaction> history = transactionDAO.getHistory(targetAccountId);
 
                             if (history.isEmpty()) {
                                 out.println("INFO: Aucune transaction trouvée.");
                             } else {
-                                // 4. Construire la réponse textuelle
-                                // Format: SUCCES_HISTORY:ID|TYPE|AMOUNT|SOURCE|DEST|DATE;ID|TYPE...
                                 StringBuilder sb = new StringBuilder("SUCCES_HISTORY:");
 
                                 for (com.bank.model.Transaction tx : history) {
@@ -160,7 +145,7 @@ public class ClientHandler implements Runnable {
                                             .append(tx.getSourceAccountId()).append("|")
                                             .append(tx.getDestAccountId()).append("|")
                                             .append(tx.getTimestamp().toString())
-                                            .append(";"); // Séparateur de ligne
+                                            .append(";");
                                 }
                                 out.println(sb.toString());
                             }
@@ -168,9 +153,7 @@ public class ClientHandler implements Runnable {
                     }
                 }
 
-                // --- GESTION BALANCE (Ancien test console) ---
                 else if ("BALANCE".equals(command)) {
-                    // Ta logique existante pour BALANCE (si tu veux la garder)
                     if (parts.length < 2) {
                         out.println("ERREUR: Usage BALANCE <id>");
                     } else {
@@ -183,16 +166,12 @@ public class ClientHandler implements Runnable {
                     }
                 }
 
-                // --- GESTION BATCH (CSV) ---
                 else if ("BATCH".equals(command)) {
-                    // Sécurité : Seul l'ADMIN a le droit de faire ça
                     if (currentUser == null || !currentUser.isAdmin()) {
                         out.println("ERREUR: Accès réservé aux administrateurs.");
                     } else {
                         String filename = (parts.length > 1) ? parts[1] : "virements_batch.csv";
 
-                        // On lance le traitement dans un nouveau Thread pour ne pas bloquer le serveur
-                        // C'est ici qu'on valide l'exigence "Parallélisme"
                         new Thread(() -> {
                             System.out.println("Lancement du batch CSV...");
                             com.bank.data.CsvProcessor processor = new com.bank.data.CsvProcessor();
@@ -203,7 +182,6 @@ public class ClientHandler implements Runnable {
                     }
                 }
 
-                // --- GESTION EXIT ---
                 else if ("EXIT".equals(command)) {
                     out.println("AU REVOIR");
                     break;

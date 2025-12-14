@@ -9,13 +9,11 @@ import java.util.concurrent.Executors;
 public class BankServer {
 
     private static final int PORT = 12345;
-    // Pool de threads : permet de gérer jusqu'à 10 clients en parallèle
     private static final ExecutorService pool = Executors.newFixedThreadPool(10);
 
     public static void main(String[] args) {
         System.out.println("Démarrage du Serveur Bancaire sur le port " + PORT + "...");
 
-        // Initialisation de la BDD (Test de connexion au démarrage)
         try {
             Class.forName("com.bank.data.DatabaseSource");
         } catch (ClassNotFoundException e) {
@@ -26,13 +24,10 @@ public class BankServer {
             System.out.println("Serveur prêt et en attente de connexions...");
 
             while (true) {
-                // 1. Bloque ici jusqu'à ce qu'un client se connecte
                 Socket clientSocket = serverSocket.accept();
 
-                // 2. Créer la tâche pour ce client
                 ClientHandler handler = new ClientHandler(clientSocket);
 
-                // 3. Déléguer l'exécution au Pool de Threads (Exécution parallèle)
                 pool.execute(handler);
             }
 

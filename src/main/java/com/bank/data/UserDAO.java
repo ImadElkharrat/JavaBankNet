@@ -15,8 +15,6 @@ public class UserDAO {
     }
 
     public User login(String username, String password) {
-        // Attention: Assure-toi que ta table s'appelle 'users' et la colonne mot de passe 'password_hash' ou 'password'
-        // Adapte la requête SQL ci-dessous selon ta base actuelle !
         String sql = "SELECT * FROM users WHERE username = ? AND password_hash = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -25,9 +23,8 @@ public class UserDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    // On gère le rôle simplement
                     String roleStr = rs.getString("role");
-                    User.UserRole role = User.UserRole.valueOf(roleStr); // "ADMIN" ou "CLIENT"
+                    User.UserRole role = User.UserRole.valueOf(roleStr);
 
                     return new User(
                             rs.getInt("id"),

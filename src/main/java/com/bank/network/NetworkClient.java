@@ -10,14 +10,12 @@ public class NetworkClient {
     private PrintWriter out;
     private BufferedReader in;
 
-    // Singleton : Une seule connexion pour toute l'app
     private NetworkClient() {
         try {
             this.socket = new Socket("localhost", 12345);
             this.out = new PrintWriter(socket.getOutputStream(), true);
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            // Consommer le message de bienvenue du serveur
             System.out.println("Serveur: " + in.readLine());
 
         } catch (IOException e) {
@@ -32,14 +30,12 @@ public class NetworkClient {
         return instance;
     }
 
-    /**
-     * Envoie une requête au serveur et attend la réponse immédiate.
-     */
+
     public String sendRequest(String request) {
         if (out == null) return "ERREUR: Pas de connexion";
         try {
-            out.println(request); // Envoi
-            return in.readLine(); // Attente réponse
+            out.println(request);
+            return in.readLine();
         } catch (IOException e) {
             return "ERREUR: " + e.getMessage();
         }

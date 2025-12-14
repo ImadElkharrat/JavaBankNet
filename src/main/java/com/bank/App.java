@@ -14,7 +14,6 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        // Charge le fichier FXML
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/login_view.fxml"));
         scene = new Scene(fxmlLoader.load(), 320, 400);
 
