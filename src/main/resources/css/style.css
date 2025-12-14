@@ -1,0 +1,177 @@
+/* Base Application Settings */
+.root {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-background-color: #f1f5f9; /* Light Grey Background */
+}
+
+/* Modern Buttons */
+.button {
+    -fx-background-color: #3b82f6; /* Modern Blue */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.3), 10, 0, 0, 4);
+    -fx-transition: all 0.3s;
+}
+
+.button:hover {
+    -fx-background-color: #2563eb; /* Darker Blue on hover */
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.button:pressed {
+    -fx-background-color: #1d4ed8;
+}
+
+/* Action Buttons (Transfer) */
+.action-btn {
+    -fx-background-color: #10b981; /* Emerald Green */
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.3), 10, 0, 0, 4);
+}
+.action-btn:hover { -fx-background-color: #059669; }
+
+/* Critical Buttons (Logout, Delete) */
+.danger-btn {
+    -fx-background-color: #ef4444; /* Red */
+    -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.3), 10, 0, 0, 4);
+}
+.danger-btn:hover { -fx-background-color: #dc2626; }
+
+/* Text Fields */
+.text-field, .password-field {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 10;
+    -fx-font-size: 14px;
+}
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #3b82f6;
+    -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.2), 5, 0, 0, 2);
+}
+
+/* Cards (Container for Content) */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 20, 0, 0, 5);
+    -fx-padding: 30;
+}
+
+/* Sidebar */
+.sidebar {
+    -fx-background-color: #0f172a; /* Dark Navy */
+}
+.sidebar-label {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* Lists */
+.list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+.list-cell {
+    -fx-background-color: white;
+    -fx-padding: 10;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1 0;
+}
+.list-cell:filled:selected, .list-cell:filled:hover {
+    -fx-background-color: #eff6ff;
+    -fx-text-fill: black;
+}/* Base Application Settings */
+ .root {
+     -fx-font-family: 'Segoe UI', sans-serif;
+     -fx-background-color: #f1f5f9; /* Light Grey Background */
+ }
+
+ /* Modern Buttons */
+ .button {
+     -fx-background-color: #3b82f6; /* Modern Blue */
+     -fx-text-fill: white;
+     -fx-font-weight: bold;
+     -fx-padding: 10 20;
+     -fx-background-radius: 8;
+     -fx-cursor: hand;
+     -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.3), 10, 0, 0, 4);
+     -fx-transition: all 0.3s;
+ }
+
+ .button:hover {
+     -fx-background-color: #2563eb; /* Darker Blue on hover */
+     -fx-scale-x: 1.05;
+     -fx-scale-y: 1.05;
+ }
+
+ .button:pressed {
+     -fx-background-color: #1d4ed8;
+ }
+
+ /* Action Buttons (Transfer) */
+ .action-btn {
+     -fx-background-color: #10b981; /* Emerald Green */
+     -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.3), 10, 0, 0, 4);
+ }
+ .action-btn:hover { -fx-background-color: #059669; }
+
+ /* Critical Buttons (Logout, Delete) */
+ .danger-btn {
+     -fx-background-color: #ef4444; /* Red */
+     -fx-effect: dropshadow(three-pass-box, rgba(239, 68, 68, 0.3), 10, 0, 0, 4);
+ }
+ .danger-btn:hover { -fx-background-color: #dc2626; }
+
+ /* Text Fields */
+ .text-field, .password-field {
+     -fx-background-color: white;
+     -fx-border-color: #e2e8f0;
+     -fx-border-radius: 6;
+     -fx-background-radius: 6;
+     -fx-padding: 10;
+     -fx-font-size: 14px;
+ }
+ .text-field:focused, .password-field:focused {
+     -fx-border-color: #3b82f6;
+     -fx-effect: dropshadow(three-pass-box, rgba(59, 130, 246, 0.2), 5, 0, 0, 2);
+ }
+
+ /* Cards (Container for Content) */
+ .card {
+     -fx-background-color: white;
+     -fx-background-radius: 12;
+     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 20, 0, 0, 5);
+     -fx-padding: 30;
+ }
+
+ /* Sidebar */
+ .sidebar {
+     -fx-background-color: #0f172a; /* Dark Navy */
+ }
+ .sidebar-label {
+     -fx-text-fill: white;
+     -fx-font-size: 18px;
+     -fx-font-weight: bold;
+ }
+
+ /* Lists */
+ .list-view {
+     -fx-background-color: transparent;
+     -fx-border-color: transparent;
+ }
+ .list-cell {
+     -fx-background-color: white;
+     -fx-padding: 10;
+     -fx-border-color: #e2e8f0;
+     -fx-border-width: 0 0 1 0;
+ }
+ .list-cell:filled:selected, .list-cell:filled:hover {
+     -fx-background-color: #eff6ff;
+     -fx-text-fill: black;
+ }

@@ -1,6 +1,7 @@
 package com.bank.network;
 
 import com.bank.data.AccountDAO;
+import com.bank.data.TransactionDAO;
 import com.bank.data.UserDAO;
 import com.bank.model.Account;
 import com.bank.model.User;
@@ -13,12 +14,14 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private AccountDAO accountDAO;
     private UserDAO userDAO;
+    private TransactionDAO transactionDAO;
     private User currentUser;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
         this.accountDAO = new AccountDAO(); // Connexion DB pour les comptes
         this.userDAO = new UserDAO();       // Connexion DB pour le login
+        this.transactionDAO = new TransactionDAO();
     }
 
     @Override
@@ -75,7 +78,6 @@ public class ClientHandler implements Runnable {
 
                 // --- GESTION TRANSFER ---
                 else if ("TRANSFER".equals(command)) {
-                    // Format: TRANSFER <src> <dest> <amount>
                     if (parts.length < 4) {
                         out.println("ERREUR: Usage TRANSFER <src> <dest> <amount>");
                     } else {
@@ -86,39 +88,81 @@ public class ClientHandler implements Runnable {
                             amount = Double.parseDouble(parts[3]);
                         } catch (NumberFormatException e) {
                             out.println("ERREUR: Montant invalide.");
-                            continue; // Passe au tour suivant de la boucle
+                            continue;
                         }
 
-                        // 1. Récupérer les objets comptes
                         Account srcAccount = accountDAO.findAccount(srcId);
                         Account destAccount = accountDAO.findAccount(destId);
 
                         if (srcAccount == null || destAccount == null) {
                             out.println("ERREUR: Un des comptes n'existe pas.");
                         } else {
-                            // 2. Vérification de sécurité (Est-ce MON compte ?)
+                            // Check ownership (Security)
                             if (currentUser.getId() != srcAccount.getUserId() && !currentUser.isAdmin()) {
                                 out.println("ERREUR: Vous ne pouvez pas débiter ce compte.");
                             } else {
-                                // 3. EXECUTION SYNCHRONISÉE (Thread-Safe)
-                                // On verrouille le compte source pour éviter qu'il soit vidé en double
+                                // SYNCHRONIZATION
                                 synchronized (srcAccount) {
                                     if (srcAccount.withdraw(amount)) {
-                                        // Si le retrait marche, on dépose sur l'autre
                                         synchronized (destAccount) {
                                             destAccount.deposit(amount);
                                         }
 
-                                        // 4. Mettre à jour la Base de Données
+                                        // 1. Update Balances in DB
                                         accountDAO.updateBalance(srcAccount);
                                         accountDAO.updateBalance(destAccount);
 
+                                        // 2. LOG THE TRANSACTION IN DB (The missing part!)
+                                        transactionDAO.logTransaction(srcId, destId, amount, "VIREMENT");
+
                                         out.println("SUCCES: Virement effectué !");
-                                        System.out.println("Virement : " + amount + " de " + srcId + " vers " + destId);
                                     } else {
                                         out.println("ERREUR: Solde insuffisant.");
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+
+                // --- GESTION HISTORIQUE ---
+                else if ("GET_HISTORY".equals(command)) {
+                    // Format: GET_HISTORY <accountId>
+                    if (parts.length < 2) {
+                        out.println("ERREUR: Usage GET_HISTORY <accountId>");
+                    } else {
+                        String targetAccountId = parts[1];
+
+                        // 1. Vérifier que le compte existe
+                        Account acc = accountDAO.findAccount(targetAccountId);
+                        if (acc == null) {
+                            out.println("ERREUR: Compte introuvable.");
+                        }
+                        // 2. Vérifier la sécurité (Est-ce que c'est MON compte ?)
+                        else if (currentUser.getId() != acc.getUserId() && !currentUser.isAdmin()) {
+                            out.println("ERREUR: Accès refusé à l'historique de ce compte.");
+                        }
+                        else {
+                            // 3. Récupérer la liste via le DAO
+                            List<com.bank.model.Transaction> history = transactionDAO.getHistory(targetAccountId);
+
+                            if (history.isEmpty()) {
+                                out.println("INFO: Aucune transaction trouvée.");
+                            } else {
+                                // 4. Construire la réponse textuelle
+                                // Format: SUCCES_HISTORY:ID|TYPE|AMOUNT|SOURCE|DEST|DATE;ID|TYPE...
+                                StringBuilder sb = new StringBuilder("SUCCES_HISTORY:");
+
+                                for (com.bank.model.Transaction tx : history) {
+                                    sb.append(tx.getId()).append("|")
+                                            .append(tx.getType()).append("|")
+                                            .append(tx.getAmount()).append("|")
+                                            .append(tx.getSourceAccountId()).append("|")
+                                            .append(tx.getDestAccountId()).append("|")
+                                            .append(tx.getTimestamp().toString())
+                                            .append(";"); // Séparateur de ligne
+                                }
+                                out.println(sb.toString());
                             }
                         }
                     }
