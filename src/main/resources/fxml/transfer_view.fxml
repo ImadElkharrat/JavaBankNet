@@ -5,25 +5,40 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="15.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bank.view.TransferController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
+<VBox alignment="CENTER" spacing="0" style="-fx-background-color: transparent;" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bank.view.TransferController">
 
-    <Label text="Effectuer un Virement">
-        <font>
-            <Font name="System Bold" size="16.0" />
-        </font>
-    </Label>
+    <VBox maxWidth="350.0" styleClass="card" spacing="15.0">
+        <padding>
+            <Insets top="25.0" right="25.0" bottom="25.0" left="25.0"/>
+        </padding>
 
-    <TextField fx:id="sourceField" promptText="Compte Source (ex: FR76-ALICE)" />
-    <TextField fx:id="destField" promptText="Compte Destination (ex: FR76-BOB)" />
-    <TextField fx:id="amountField" promptText="Montant (ex: 500.00)" />
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label text="💸" style="-fx-font-size: 24px;"/>
+            <VBox>
+                <Label text="Nouveau Virement" textFill="#0f172a">
+                    <font><Font name="System Bold" size="18.0" /></font>
+                </Label>
+                <Label text="Transférez de l'argent instantanément" textFill="#64748b" style="-fx-font-size: 12px;"/>
+            </VBox>
+        </HBox>
 
-    <Label fx:id="statusLabel" textFill="RED" />
+        <VBox spacing="10.0">
+            <Label text="Compte Débiteur" textFill="#64748b" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+            <TextField fx:id="sourceField" promptText="ex: FR76-ALICE" />
 
-    <Button onAction="#handleConfirm" text="Valider le Virement"
-            style="-fx-background-color: #28a745; -fx-text-fill: white;" prefWidth="200.0" />
+            <Label text="Bénéficiaire" textFill="#64748b" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+            <TextField fx:id="destField" promptText="ex: FR76-BOB" />
+
+            <Label text="Montant (DH)" textFill="#64748b" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+            <TextField fx:id="amountField" promptText="0.00" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10b981;" />
+        </VBox>
+
+        <Label fx:id="statusLabel" textFill="#ef4444" wrapText="true"/>
+
+        <Button onAction="#handleConfirm" text="Confirmer le virement"
+                maxWidth="Infinity" styleClass="action-btn" style="-fx-font-size: 14px; -fx-padding: 12 20;" />
+    </VBox>
 </VBox>

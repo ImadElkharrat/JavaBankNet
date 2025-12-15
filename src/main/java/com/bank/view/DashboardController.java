@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -18,6 +19,7 @@ public class DashboardController {
 
     @FXML private Label welcomeLabel;
     @FXML private Button adminBatchButton;
+    @FXML private Button adminPanelButton;
 
     @FXML private ListView<String> accountsList;
 
@@ -33,6 +35,10 @@ public class DashboardController {
 
         if ("admin".equalsIgnoreCase(username)) {
             adminBatchButton.setVisible(true);
+            adminPanelButton.setVisible(true);
+        } else {
+        adminBatchButton.setVisible(false);
+        adminPanelButton.setVisible(false);
         }
 
         colDate.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
@@ -49,6 +55,23 @@ public class DashboardController {
         });
 
         handleRefresh();
+    }
+
+    @FXML
+    private void handleOpenAdmin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/admin_panel.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Administration - JavaBank");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Erreur: Impossible d'ouvrir admin_panel.fxml. Vérifie le chemin !");
+        }
     }
 
     @FXML

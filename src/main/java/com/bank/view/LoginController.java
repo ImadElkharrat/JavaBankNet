@@ -3,11 +3,14 @@ package com.bank.view;
 import com.bank.network.NetworkClient;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class LoginController {
 
@@ -26,18 +29,30 @@ public class LoginController {
 
         if (response != null && response.startsWith("SUCCES")) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard_view.fxml"));
-                javafx.scene.Parent root = loader.load();
+                if ("admin".equalsIgnoreCase(user)) {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/admin_panel.fxml"));
+                    Parent root = loader.load();
 
-                DashboardController dashboard = loader.getController();
-                dashboard.initData(user);
 
-                Stage stage = (Stage) usernameField.getScene().getWindow();
-                stage.setScene(new Scene(root));
+                    Stage stage = (Stage) usernameField.getScene().getWindow();
+                    stage.setTitle("Administration - JavaBank");
+                    stage.setScene(new Scene(root));
 
-            } catch (java.io.IOException e) {
+                } else {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard_view.fxml"));
+                    Parent root = loader.load();
+
+                    DashboardController controller = loader.getController();
+                    controller.initData(user);
+
+                    Stage stage = (Stage) usernameField.getScene().getWindow();
+                    stage.setTitle("Tableau de bord");
+                    stage.setScene(new Scene(root));
+                }
+
+            } catch (IOException e) {
                 e.printStackTrace();
-                showError("Erreur chargement Dashboard.");
+                showError("Erreur de chargement de la vue.");
             }
         } else {
             showError("Identifiants incorrects.");

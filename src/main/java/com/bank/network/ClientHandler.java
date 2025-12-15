@@ -166,6 +166,118 @@ public class ClientHandler implements Runnable {
                     }
                 }
 
+                else if (command.startsWith("ADMIN_")) {
+
+                    if (currentUser == null || !currentUser.isAdmin()) {
+                        out.println("ERREUR: Accès refusé. Vous n'êtes pas administrateur.");
+                        continue;
+                    }
+
+
+                    if ("ADMIN_DEPOSIT".equals(command)) {
+                        if (parts.length < 3) { out.println("ERREUR: Usage ADMIN_DEPOSIT <acc> <amount>"); continue; }
+                        String accId = parts[1];
+                        double amount = Double.parseDouble(parts[2]);
+
+                        Account acc = accountDAO.findAccount(accId);
+                        if (acc != null) {
+                            synchronized(acc) {
+                                acc.deposit(amount);
+                                accountDAO.updateBalance(acc);
+                                transactionDAO.logTransaction(accId, accId, amount, "DEPOSIT");
+                            }
+                            out.println("SUCCES: " + amount + " ajouté au compte " + accId);
+                        } else {
+                            out.println("ERREUR: Compte introuvable.");
+                        }
+                    }
+
+                    else if ("ADMIN_WITHDRAW".equals(command)) {
+                        if (parts.length < 3) { out.println("ERREUR: Usage ADMIN_WITHDRAW <acc> <amount>"); continue; }
+                        String accId = parts[1];
+                        double amount = Double.parseDouble(parts[2]);
+
+                        Account acc = accountDAO.findAccount(accId);
+                        if (acc != null) {
+                            synchronized(acc) {
+                                if(acc.withdraw(amount)) {
+                                    accountDAO.updateBalance(acc);
+                                    transactionDAO.logTransaction(accId, accId, amount, "WITHDRAW");
+                                    out.println("SUCCES: " + amount + " retiré du compte " + accId);
+                                } else {
+                                    out.println("ERREUR: Solde insuffisant.");
+                                }
+                            }
+                        } else {
+                            out.println("ERREUR: Compte introuvable.");
+                        }
+                    }
+
+                    else if ("ADMIN_CREATE".equals(command)) {
+                        if (parts.length < 5) { out.println("ERREUR: Usage ADMIN_CREATE <accNum> <user> <type> <bal>"); continue; }
+                        String accNum = parts[1];
+                        String username = parts[2];
+                        String type = parts[3];
+                        double balance = Double.parseDouble(parts[4]);
+
+                        User owner = userDAO.findUserByUsername(username);
+                        if (owner == null) {
+                            out.println("ERREUR: L'utilisateur '" + username + "' n'existe pas.");
+                        } else {
+                            Account newAcc = new Account(accNum, owner.getId(), balance, type);
+                            if (accountDAO.createAccount(newAcc, owner.getId())) {
+                                out.println("SUCCES: Compte " + accNum + " créé pour " + username);
+                            } else {
+                                out.println("ERREUR: Création échouée (numéro déjà pris ?).");
+                            }
+                        }
+                    }
+
+                    else if ("ADMIN_DELETE".equals(command)) {
+                        if (parts.length < 2) { out.println("ERREUR: Usage ADMIN_DELETE <accNum>"); continue; }
+                        String accNum = parts[1];
+
+                        if (accountDAO.deleteAccount(accNum)) {
+                            out.println("SUCCES: Compte " + accNum + " supprimé.");
+                        } else {
+                            out.println("ERREUR: Suppression impossible (Vérifiez s'il existe ou s'il a des transactions).");
+                        }
+                    }
+
+                    else if ("ADMIN_FIND_ACCOUNTS".equals(command)) {
+                        if (parts.length < 2) {
+                            out.println("ERREUR: Usage ADMIN_FIND_ACCOUNTS <user>");
+                            continue;
+                        }
+                        String input = parts[1];
+
+                        // 1. On cherche l'utilisateur
+                        User targetUser = userDAO.findUserByUsername(input);
+
+                        if (targetUser == null) {
+                            out.println("ERREUR: Utilisateur '" + input + "' introuvable.");
+                        } else {
+                            // 2. On récupère ses comptes via son ID
+                            List<Account> accounts = accountDAO.getAccountsByUserId(targetUser.getId());
+
+                            if (accounts.isEmpty()) {
+                                out.println("INFO: Aucun compte trouvé pour cet utilisateur.");
+                            } else {
+                                // 3. On formate la réponse pour afficher les Numéros de Compte
+                                StringBuilder sb = new StringBuilder("SUCCES_LIST:");
+                                for (Account a : accounts) {
+                                    sb.append("Compte N° ")
+                                            .append(a.getAccountNumber())
+                                            .append(" (")
+                                            .append(a.getBalance())
+                                            .append(" DH);");
+                                }
+                                out.println(sb.toString());
+                            }
+                        }
+                    }
+                }
+
                 else if ("BATCH".equals(command)) {
                     if (currentUser == null || !currentUser.isAdmin()) {
                         out.println("ERREUR: Accès réservé aux administrateurs.");

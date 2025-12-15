@@ -95,4 +95,16 @@ public class AccountDAO {
             return false;
         }
     }
+
+    public boolean deleteAccount(String accountNumber) {
+        String sql = "DELETE FROM accounts WHERE account_number = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, accountNumber);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.err.println("Erreur suppression compte : " + e.getMessage());
+            return false;
+        }
+    }
 }

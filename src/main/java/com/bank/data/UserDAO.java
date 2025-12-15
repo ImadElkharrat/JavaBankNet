@@ -41,4 +41,38 @@ public class UserDAO {
         }
         return null;
     }
+
+    public com.bank.model.User findUserByUsername(String username) {
+        String sql = "SELECT * FROM users WHERE username = ?";
+        try (java.sql.PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // On reconstruit l'objet User
+                    // Adaptez "role" selon comment il est stocké (String ou Enum)
+                    String roleStr = rs.getString("role");
+                    /* Si votre constructeur attend une String pour le rôle :
+                    return new com.bank.model.User(
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("password_hash"),
+                            roleStr
+                    );
+                    */
+
+                    // SI VOTRE CONSTRUCTEUR ATTEND UN ENUM (comme vu précédemment), UTILISEZ CECI À LA PLACE :
+                    return new com.bank.model.User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password_hash"),
+                        com.bank.model.User.UserRole.valueOf(roleStr)
+                    );
+
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
