@@ -1,56 +1,74 @@
 package com.bank.data;
 
 import com.bank.model.Account;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CsvProcessor {
 
+    private AccountDAO accountDAO;
+    private TransactionDAO transactionDAO;
+
+    public CsvProcessor() {
+        this.accountDAO = new AccountDAO();
+        this.transactionDAO = new TransactionDAO();
+    }
 
     public void processBatchFile(String filePath) {
         System.out.println("Début du traitement du fichier : " + filePath);
 
-        try (Stream<String> lines = Files.lines(Paths.get(filePath))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
 
-            lines
-                    .parallel()
-                    .skip(1)
-                    .filter(line -> !line.isEmpty())
-                    .forEach(line -> {
-                        parseAndExecute(line);
-                    });
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(";");
+
+                if (data.length >= 3) {
+                    String srcId = data[0].trim();
+                    String destId = data[1].trim();
+                    double amount;
+
+                    try {
+                        amount = Double.parseDouble(data[2].trim());
+                    } catch (NumberFormatException e) {
+                        System.err.println("Erreur montant invalide ligne : " + line);
+                        continue;
+                    }
+
+                    processSingleTransfer(srcId, destId, amount);
+                }
+            }
+            System.out.println("Fin du traitement batch.");
 
         } catch (IOException e) {
-            System.err.println("Erreur lors de la lecture du fichier : " + e.getMessage());
+            System.err.println("Erreur lecture fichier CSV : " + e.getMessage());
         }
     }
 
+    private void processSingleTransfer(String srcId, String destId, double amount) {
+        Account srcAccount = accountDAO.findAccount(srcId);
+        Account destAccount = accountDAO.findAccount(destId);
 
-    private void parseAndExecute(String line) {
-        try {
-            String[] parts = line.split(";");
-            if (parts.length < 3) return;
+        if (srcAccount != null && destAccount != null) {
+            synchronized (srcAccount) {
+                if (srcAccount.withdraw(amount)) {
+                    synchronized (destAccount) {
+                        destAccount.deposit(amount);
+                    }
 
-            String sourceAcc = parts[0];
-            String destAcc = parts[1];
-            double amount = Double.parseDouble(parts[2]);
-            String reason = parts.length > 3 ? parts[3] : "Virement";
+                    accountDAO.updateBalance(srcAccount);
+                    accountDAO.updateBalance(destAccount);
 
-            System.out.println(String.format(
-                    "[Thread: %s] Traitement : %s -> %s : %.2f (%s)",
-                    Thread.currentThread().getName(), sourceAcc, destAcc, amount, reason
-            ));
+                    transactionDAO.logTransaction(srcId, destId, amount, "VIREMENT");
 
-            // TODO: Appeler ici bankService.transfer(sourceAcc, destAcc, amount);
-
-        } catch (NumberFormatException e) {
-            System.err.println("Erreur de format de nombre dans la ligne : " + line);
-        } catch (Exception e) {
-            System.err.println("Erreur inconnue sur la ligne : " + line);
+                    System.out.println("Succès Batch : " + amount + " de " + srcId + " vers " + destId);
+                } else {
+                    System.err.println("Échec Batch : Solde insuffisant pour " + srcId);
+                }
+            }
+        } else {
+            System.err.println("Échec Batch : Compte introuvable (" + srcId + " ou " + destId + ")");
         }
     }
 }

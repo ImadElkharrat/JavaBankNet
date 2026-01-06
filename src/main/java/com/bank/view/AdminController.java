@@ -11,6 +11,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.FileChooser;
+import java.io.File;
+import java.io.PrintWriter;
 
 public class AdminController {
 
@@ -45,14 +48,14 @@ public class AdminController {
     private void handleDeposit() {
         String acc = fundAccountField.getText();
         String amt = fundAmountField.getText();
-        sendCmd("ADMIN_DEPOSIT " + acc + " " + amt);
+        sendCmd("ADMIN_DEPOSIT " + acc + " " + amt + " DEPOSIT ");
     }
 
     @FXML
     private void handleWithdraw() {
         String acc = fundAccountField.getText();
         String amt = fundAmountField.getText();
-        sendCmd("ADMIN_WITHDRAW " + acc + " " + amt);
+        sendCmd("ADMIN_WITHDRAW " + acc + " " + amt + " WITHDRAW ");
     }
 
     @FXML
@@ -92,6 +95,61 @@ public class AdminController {
         alert.setHeaderText("Historique du compte " + acc);
         alert.setContentText(response.length() > 500 ? response.substring(0, 500) + "..." : response);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void handleExportExcel() {
+        String acc = historyAccField.getText();
+        if (acc.isEmpty()) {
+            statusLabel.setText("Veuillez entrer un numéro de compte.");
+            return;
+        }
+
+        String response = NetworkClient.getInstance().sendRequest("GET_HISTORY " + acc);
+
+        if (response.startsWith("SUCCES_HISTORY:")) {
+            StringBuilder csvContent = new StringBuilder();
+            csvContent.append("ID;Type;Montant;Source;Destination;Date\n");
+
+            String rawData = response.substring(15);
+            String[] lines = rawData.split(";");
+
+            for (String line : lines) {
+                if (!line.isBlank()) {
+                    csvContent.append(line.replace("|", ";")).append("\n");
+                }
+            }
+
+            saveToCsvFile(acc, csvContent.toString());
+
+        } else {
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+            alert.setTitle("Erreur Export");
+            alert.setHeaderText("Impossible d'exporter l'historique");
+            alert.setContentText(response);
+            alert.showAndWait();
+        }
+    }
+
+    private void saveToCsvFile(String accountId, String content) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer l'historique Excel");
+        fileChooser.setInitialFileName("Historique_" + accountId + ".csv");
+
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers Excel/CSV", "*.csv"));
+
+        Stage stage = (Stage) statusLabel.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            try (PrintWriter writer = new PrintWriter(file)) {
+                writer.write(content);
+                statusLabel.setText("Export réussi : " + file.getName());
+            } catch (Exception e) {
+                e.printStackTrace();
+                statusLabel.setText("Erreur lors de l'enregistrement du fichier.");
+            }
+        }
     }
 
     private void sendCmd(String cmd) {

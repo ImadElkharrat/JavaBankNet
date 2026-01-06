@@ -90,6 +90,7 @@
                         <Label text="Audit Compte :" textFill="#64748b"/>
                         <TextField fx:id="historyAccField" promptText="Numéro de compte" HBox.hgrow="ALWAYS"/>
                         <Button onAction="#handleGetHistory" text="Voir Logs" />
+                        <Button onAction="#handleExportExcel" text="📊 Export Excel" style="-fx-background-color: #217346; -fx-text-fill: white;" />
                     </HBox>
                 </VBox>
             </HBox>
