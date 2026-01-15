@@ -48,19 +48,9 @@ public class UserDAO {
             stmt.setString(1, username);
             try (java.sql.ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    // On reconstruit l'objet User
-                    // Adaptez "role" selon comment il est stocké (String ou Enum)
                     String roleStr = rs.getString("role");
-                    /* Si votre constructeur attend une String pour le rôle :
-                    return new com.bank.model.User(
-                            rs.getInt("id"),
-                            rs.getString("username"),
-                            rs.getString("password_hash"),
-                            roleStr
-                    );
-                    */
 
-                    // SI VOTRE CONSTRUCTEUR ATTEND UN ENUM (comme vu précédemment), UTILISEZ CECI À LA PLACE :
+
                     return new com.bank.model.User(
                         rs.getInt("id"),
                         rs.getString("username"),
